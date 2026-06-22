@@ -5,13 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Pulse Final Mile — Coverage Map</title>
 
-<!--
-  NOTE: This file was built without live access to https://diverselogistics.com/map/
-  (network access to that host was unavailable in the build environment), so the
-  Mapbox public token below could not be copied from the reference page. See the
-  <!-- TODO --> comment near the token for what to do instead.
--->
-
 <link href="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css" rel="stylesheet">
 <script src="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/topojson-client/3.1.0/topojson-client.min.js"></script>
@@ -123,16 +116,8 @@
 
 <script>
 (function () {
-  // TODO: Public Mapbox token could not be retrieved from
-  // https://diverselogistics.com/map/ because the build environment had no
-  // network access to that host. Replace the placeholder below with a
-  // public token (starts with "pk.eyJ...") created at
-  // https://account.mapbox.com/access-tokens/ (free account). If you reuse
-  // the Diverse Logistics token instead, note that public Mapbox tokens can
-  // be URL-restricted to specific domains — if it was scoped to
-  // diverselogistics.com it will NOT work on pulsefinalmile.com and the map
-  // will render as blank/grey tiles with a console "Unauthorized" error.
-  var MAPBOX_TOKEN = 'YOUR_MAPBOX_TOKEN_HERE';
+  // Pulse Final Mile's own public Mapbox token.
+  var MAPBOX_TOKEN = 'pk.eyJ1Ijoia3ViYWt1YmE5MSIsImEiOiJjbWZ2YXp2dnUwNXBnMmtwb3pvdXQzaHVjIn0.bGQ9yF7-o1ZR0kkUdKHfCA';
 
   mapboxgl.accessToken = MAPBOX_TOKEN;
 
