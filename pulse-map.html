@@ -156,16 +156,19 @@
   });
 
   // us-atlas's states-10m.json identifies states by FIPS code (the
-  // feature's `id`), not by a `properties.name` string, so service-area
-  // states are matched by FIPS code rather than name.
-  var STATE_ABBR_TO_FIPS = {
-    AZ: 4, CA: 6, CO: 8, FL: 12, IL: 17, MN: 27, NJ: 34, OR: 41,
-    PA: 42, TN: 47, TX: 48, UT: 49, WA: 53
-  };
+  // feature's `id`), not by a `properties.name` string.
+  // This list matches the Diverse Logistics reference map's highlighted
+  // footprint (the lower 48 minus Montana, Idaho, Wyoming, North Dakota,
+  // South Dakota and Nevada) rather than being derived from Pulse's own
+  // location list.
+  var SERVICE_AREA_STATE_FIPS = [
+    1, 4, 5, 6, 8, 9, 10, 12, 13, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26,
+    27, 28, 29, 31, 33, 34, 35, 36, 37, 39, 40, 41, 42, 44, 45, 47, 48,
+    49, 50, 51, 53, 54, 55
+  ];
 
-  var serviceAreaFips = locations.reduce(function (acc, loc) {
-    var fips = STATE_ABBR_TO_FIPS[loc.state];
-    if (fips) acc[fips] = true;
+  var serviceAreaFips = SERVICE_AREA_STATE_FIPS.reduce(function (acc, fips) {
+    acc[fips] = true;
     return acc;
   }, {});
 
