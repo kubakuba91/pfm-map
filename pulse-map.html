@@ -248,14 +248,27 @@
           }
         });
 
+        // Merge the filtered state geometries into one shape so the line
+        // layer only traces the outer perimeter of the service area,
+        // skipping the seams between adjacent highlighted states.
+        var filteredGeometries = topology.objects.states.geometries.filter(function (geometry) {
+          return serviceAreaFips[Number(geometry.id)];
+        });
+        var mergedBorder = topojson.merge(topology, filteredGeometries);
+
+        map.addSource('pulse-service-area-outline', {
+          type: 'geojson',
+          data: { type: 'Feature', geometry: mergedBorder, properties: {} }
+        });
+
         map.addLayer({
           id: 'pulse-service-area-border',
           type: 'line',
-          source: 'pulse-service-area',
+          source: 'pulse-service-area-outline',
           paint: {
             'line-color': '#3E68B2',
-            'line-opacity': 1,
-            'line-width': 2
+            'line-opacity': 0.8,
+            'line-width': 1.5
           }
         });
       })
