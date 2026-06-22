@@ -200,6 +200,27 @@
   map.boxZoom.disable();
 
   map.on('load', function () {
+    // Markers don't depend on the state boundary fetch below, so add them
+    // immediately — a slow/blocked CDN request shouldn't hide the pins.
+    locations.forEach(function (loc) {
+      var isHq = loc.type === 'hq';
+      var el = document.createElement('div');
+      el.className = 'pulse-marker' + (isHq ? ' hq-marker' : '');
+      el.innerHTML = badgeSvg(isHq ? HQ_COLOR : SERVICE_COLOR, isHq ? 'P' : null);
+
+      var popup = new mapboxgl.Popup({
+        offset: 18,
+        closeButton: false,
+        closeOnClick: true,
+        className: 'pulse-map-popup'
+      }).setText(loc.city + ', ' + loc.state);
+
+      new mapboxgl.Marker({ element: el, anchor: 'center' })
+        .setLngLat([loc.lng, loc.lat])
+        .setPopup(popup)
+        .addTo(map);
+    });
+
     fetch('https://cdn.jsdelivr.net/npm/us-atlas@3/states-10m.json')
       .then(function (res) { return res.json(); })
       .then(function (topology) {
@@ -214,6 +235,9 @@
           data: statesGeoJson
         });
 
+        // Insert below the marker layer (markers are DOM elements, not a
+        // GL layer, so this just keeps the fill/border under any future
+        // GL layers and the base style's place labels).
         map.addLayer({
           id: 'pulse-service-area-fill',
           type: 'fill',
@@ -233,26 +257,6 @@
             'line-opacity': 1,
             'line-width': 2
           }
-        });
-
-        // Markers are added after the choropleth layers so they render on top.
-        locations.forEach(function (loc) {
-          var isHq = loc.type === 'hq';
-          var el = document.createElement('div');
-          el.className = 'pulse-marker' + (isHq ? ' hq-marker' : '');
-          el.innerHTML = badgeSvg(isHq ? HQ_COLOR : SERVICE_COLOR, isHq ? 'P' : null);
-
-          var popup = new mapboxgl.Popup({
-            offset: 18,
-            closeButton: false,
-            closeOnClick: true,
-            className: 'pulse-map-popup'
-          }).setText(loc.city + ', ' + loc.state);
-
-          new mapboxgl.Marker({ element: el, anchor: 'center' })
-            .setLngLat([loc.lng, loc.lat])
-            .setPopup(popup)
-            .addTo(map);
         });
       })
       .catch(function (err) {
