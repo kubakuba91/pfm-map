@@ -224,11 +224,18 @@
     fetch('https://cdn.jsdelivr.net/npm/us-atlas@3/states-10m.json')
       .then(function (res) { return res.json(); })
       .then(function (topology) {
+        console.log('Pulse map debug: topology.objects keys =', Object.keys(topology.objects));
+
         var statesGeoJson = topojson.feature(topology, topology.objects.states);
+        console.log('Pulse map debug: total state features =', statesGeoJson.features.length);
+        console.log('Pulse map debug: sample feature =', JSON.stringify(statesGeoJson.features[0]).slice(0, 300));
+        console.log('Pulse map debug: serviceAreaFips =', serviceAreaFips);
 
         statesGeoJson.features = statesGeoJson.features.filter(function (feature) {
           return serviceAreaFips[Number(feature.id)];
         });
+        console.log('Pulse map debug: filtered feature count =', statesGeoJson.features.length,
+          'ids =', statesGeoJson.features.map(function (f) { return f.id; }));
 
         map.addSource('pulse-service-area', {
           type: 'geojson',
