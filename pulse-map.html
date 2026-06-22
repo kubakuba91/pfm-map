@@ -56,14 +56,9 @@
   }
   .pulse-map-legend-swatch {
     flex: 0 0 auto;
-    width: 14px;
-    height: 14px;
-    border-radius: 3px;
-  }
-  .pulse-map-legend-swatch.is-pin {
-    width: 14px;
-    height: 14px;
-    border-radius: 50%;
+    width: 16px;
+    height: 16px;
+    display: block;
   }
   .pulse-map-popup .mapboxgl-popup-content {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
@@ -101,11 +96,17 @@
   <div class="pulse-map-legend">
     <h4>Pulse Final Mile</h4>
     <div class="pulse-map-legend-row">
-      <span class="pulse-map-legend-swatch is-pin" style="background:#3E68B2;"></span>
+      <svg class="pulse-map-legend-swatch" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="16" cy="16" r="13" fill="#3E68B2" stroke="#ffffff" stroke-width="3"/>
+        <text x="16" y="21" text-anchor="middle" font-size="14" font-weight="700" fill="#ffffff">P</text>
+      </svg>
       <span>Headquarters</span>
     </div>
     <div class="pulse-map-legend-row">
-      <span class="pulse-map-legend-swatch is-pin" style="background:#6E8FCB;"></span>
+      <svg class="pulse-map-legend-swatch" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="16" cy="16" r="13" fill="#6E8FCB" stroke="#ffffff" stroke-width="3"/>
+        <circle cx="16" cy="16" r="4" fill="#ffffff"/>
+      </svg>
       <span>Service Centers</span>
     </div>
   </div>
