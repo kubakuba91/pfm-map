@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pulse Final Mile — Coverage Map</title>
+
+<!--
+  NOTE: This file was built without live access to https://diverselogistics.com/map/
+  (network access to that host was unavailable in the build environment), so the
+  Mapbox public token below could not be copied from the reference page. See the
+  <!-- TODO --> comment near the token for what to do instead.
+-->
+
+<link href="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css" rel="stylesheet">
+<script src="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/topojson-client/3.1.0/topojson-client.min.js"></script>
+
+<style>
+  #pulse-map-embed * {
+    box-sizing: border-box;
+  }
+  #pulse-map-embed {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    position: relative;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+  #pulse-map-container {
+    width: 100%;
+    height: 600px;
+    border-radius: 6px;
+    overflow: hidden;
+  }
+  .pulse-map-legend {
+    position: absolute;
+    left: 16px;
+    bottom: 24px;
+    z-index: 1;
+    background: rgba(255, 255, 255, 0.92);
+    border-radius: 6px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+    padding: 12px 14px;
+    font-size: 13px;
+    line-height: 1.6;
+    color: #1f2733;
+    min-width: 170px;
+  }
+  .pulse-map-legend h4 {
+    margin: 0 0 8px 0;
+    font-size: 13px;
+    font-weight: 700;
+    color: #1f2733;
+  }
+  .pulse-map-legend-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 4px;
+  }
+  .pulse-map-legend-row:last-child {
+    margin-bottom: 0;
+  }
+  .pulse-map-legend-swatch {
+    flex: 0 0 auto;
+    width: 14px;
+    height: 14px;
+    border-radius: 3px;
+  }
+  .pulse-map-legend-swatch.is-pin {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+  }
+  .pulse-map-popup .mapboxgl-popup-content {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    color: #1f2733;
+    padding: 8px 12px;
+    border-radius: 4px;
+  }
+  .pulse-marker {
+    width: 26px;
+    height: 26px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .pulse-marker svg {
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+  .pulse-marker.hq-marker {
+    width: 32px;
+    height: 32px;
+  }
+</style>
+</head>
+<body>
+
+<!-- SQUARESPACE EMBED: start here -->
+<div id="pulse-map-embed">
+  <div id="pulse-map-container"></div>
+  <div class="pulse-map-legend">
+    <h4>Pulse Final Mile</h4>
+    <div class="pulse-map-legend-row">
+      <span class="pulse-map-legend-swatch is-pin" style="background:#3E68B2;"></span>
+      <span>Headquarters</span>
+    </div>
+    <div class="pulse-map-legend-row">
+      <span class="pulse-map-legend-swatch is-pin" style="background:#6E8FCB;"></span>
+      <span>Service Centers</span>
+    </div>
+    <div class="pulse-map-legend-row">
+      <span class="pulse-map-legend-swatch" style="background:#8FA9D6;"></span>
+      <span>Delivery Area</span>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  // TODO: Public Mapbox token could not be retrieved from
+  // https://diverselogistics.com/map/ because the build environment had no
+  // network access to that host. Replace the placeholder below with a
+  // public token (starts with "pk.eyJ...") created at
+  // https://account.mapbox.com/access-tokens/ (free account). If you reuse
+  // the Diverse Logistics token instead, note that public Mapbox tokens can
+  // be URL-restricted to specific domains — if it was scoped to
+  // diverselogistics.com it will NOT work on pulsefinalmile.com and the map
+  // will render as blank/grey tiles with a console "Unauthorized" error.
+  var MAPBOX_TOKEN = 'YOUR_MAPBOX_TOKEN_HERE';
+
+  mapboxgl.accessToken = MAPBOX_TOKEN;
+
+  var locations = [
+    { city: 'Bloomington',      state: 'MN', lat: 44.8408,  lng: -93.2983,  type: 'hq' },
+    { city: 'Nashville',        state: 'TN', lat: 36.1627,  lng: -86.7816,  type: 'service' },
+    { city: 'Salt Lake City',   state: 'UT', lat: 40.7608,  lng: -111.8910, type: 'service' },
+    { city: 'Knoxville',        state: 'TN', lat: 35.9606,  lng: -83.9207,  type: 'service' },
+    { city: 'Santa Fe Springs', state: 'CA', lat: 33.9472,  lng: -118.0853, type: 'service' },
+    { city: 'Denver',           state: 'CO', lat: 39.7392,  lng: -104.9903, type: 'service' },
+    { city: 'Phoenix',          state: 'AZ', lat: 33.4484,  lng: -112.0740, type: 'service' },
+    { city: 'Tracy',            state: 'CA', lat: 37.7397,  lng: -121.4252, type: 'service' },
+    { city: 'Coppell',          state: 'TX', lat: 32.9546,  lng: -97.0150,  type: 'service' },
+    { city: 'Elizabeth',        state: 'NJ', lat: 40.6639,  lng: -74.2107,  type: 'service' },
+    { city: 'Fullerton',        state: 'CA', lat: 33.8704,  lng: -117.9242, type: 'service' },
+    { city: 'Groveland',        state: 'FL', lat: 28.5586,  lng: -81.8517,  type: 'service' },
+    { city: 'Hazleton',         state: 'PA', lat: 40.9584,  lng: -75.9746,  type: 'service' },
+    { city: 'Tacoma',           state: 'WA', lat: 47.2529,  lng: -122.4443, type: 'service' },
+    { city: 'University Park',  state: 'IL', lat: 41.4428,  lng: -87.6867,  type: 'service' },
+    { city: 'Walnut',           state: 'CA', lat: 34.0203,  lng: -117.8653, type: 'service' },
+    { city: 'Dayton',           state: 'NJ', lat: 40.3765,  lng: -74.5107,  type: 'service' },
+    { city: 'Fontana',          state: 'CA', lat: 34.0922,  lng: -117.4350, type: 'service' },
+    { city: 'Portland',         state: 'OR', lat: 45.5152,  lng: -122.6784, type: 'service' },
+    { city: 'Houston',          state: 'TX', lat: 29.7604,  lng: -95.3698,  type: 'service' }
+  ];
+
+  // Dedupe on city+state, just in case.
+  var seen = {};
+  locations = locations.filter(function (loc) {
+    var key = loc.city + '|' + loc.state;
+    if (seen[key]) return false;
+    seen[key] = true;
+    return true;
+  });
+
+  var STATE_ABBR_TO_NAME = {
+    AZ: 'Arizona', CA: 'California', CO: 'Colorado', FL: 'Florida',
+    IL: 'Illinois', MN: 'Minnesota', NJ: 'New Jersey', OR: 'Oregon',
+    PA: 'Pennsylvania', TN: 'Tennessee', TX: 'Texas', UT: 'Utah',
+    WA: 'Washington'
+  };
+
+  var serviceAreaNames = Object.keys(
+    locations.reduce(function (acc, loc) {
+      var name = STATE_ABBR_TO_NAME[loc.state];
+      if (name) acc[name] = true;
+      return acc;
+    }, {})
+  );
+
+  var HQ_COLOR = '#3E68B2';
+  var SERVICE_COLOR = '#6E8FCB';
+
+  function pinSvg(color) {
+    return (
+      '<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">' +
+      '<path d="M12 0C7.6 0 4 3.6 4 8c0 6 8 16 8 16s8-10 8-16c0-4.4-3.6-8-8-8z" ' +
+      'fill="' + color + '" stroke="#ffffff" stroke-width="1.2"/>' +
+      '<circle cx="12" cy="8" r="3" fill="#ffffff"/>' +
+      '</svg>'
+    );
+  }
+
+  var map = new mapboxgl.Map({
+    container: 'pulse-map-container',
+    style: 'mapbox://styles/mapbox/light-v11',
+    center: [-96, 38],
+    zoom: 4,
+    pitchWithRotate: false,
+    dragRotate: false,
+    touchPitch: false
+  });
+
+  map.touchZoomRotate.disableRotation();
+  map.scrollZoom.disable();
+  map.boxZoom.disable();
+
+  map.on('load', function () {
+    fetch('https://cdn.jsdelivr.net/npm/us-atlas@3/states-10m.json')
+      .then(function (res) { return res.json(); })
+      .then(function (topology) {
+        var statesGeoJson = topojson.feature(topology, topology.objects.states);
+
+        statesGeoJson.features = statesGeoJson.features.filter(function (feature) {
+          return serviceAreaNames.indexOf(feature.properties.name) !== -1;
+        });
+
+        map.addSource('pulse-service-area', {
+          type: 'geojson',
+          data: statesGeoJson
+        });
+
+        map.addLayer({
+          id: 'pulse-service-area-fill',
+          type: 'fill',
+          source: 'pulse-service-area',
+          paint: {
+            'fill-color': '#8FA9D6',
+            'fill-opacity': 0.45
+          }
+        });
+
+        map.addLayer({
+          id: 'pulse-service-area-border',
+          type: 'line',
+          source: 'pulse-service-area',
+          paint: {
+            'line-color': '#3E68B2',
+            'line-opacity': 0.8,
+            'line-width': 1.5
+          }
+        });
+
+        // Markers are added after the choropleth layers so they render on top.
+        locations.forEach(function (loc) {
+          var isHq = loc.type === 'hq';
+          var el = document.createElement('div');
+          el.className = 'pulse-marker' + (isHq ? ' hq-marker' : '');
+          el.innerHTML = pinSvg(isHq ? HQ_COLOR : SERVICE_COLOR);
+
+          var popup = new mapboxgl.Popup({
+            offset: 20,
+            closeButton: false,
+            closeOnClick: true,
+            className: 'pulse-map-popup'
+          }).setText(loc.city + ', ' + loc.state);
+
+          new mapboxgl.Marker({ element: el, anchor: 'bottom' })
+            .setLngLat([loc.lng, loc.lat])
+            .setPopup(popup)
+            .addTo(map);
+        });
+      })
+      .catch(function (err) {
+        console.error('Pulse map: failed to load state boundary data', err);
+      });
+  });
+})();
+</script>
+<!-- SQUARESPACE EMBED: end here -->
+
+</body>
+</html>
