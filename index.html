@@ -155,20 +155,19 @@
     return true;
   });
 
-  var STATE_ABBR_TO_NAME = {
-    AZ: 'Arizona', CA: 'California', CO: 'Colorado', FL: 'Florida',
-    IL: 'Illinois', MN: 'Minnesota', NJ: 'New Jersey', OR: 'Oregon',
-    PA: 'Pennsylvania', TN: 'Tennessee', TX: 'Texas', UT: 'Utah',
-    WA: 'Washington'
+  // us-atlas's states-10m.json identifies states by FIPS code (the
+  // feature's `id`), not by a `properties.name` string, so service-area
+  // states are matched by FIPS code rather than name.
+  var STATE_ABBR_TO_FIPS = {
+    AZ: 4, CA: 6, CO: 8, FL: 12, IL: 17, MN: 27, NJ: 34, OR: 41,
+    PA: 42, TN: 47, TX: 48, UT: 49, WA: 53
   };
 
-  var serviceAreaNames = Object.keys(
-    locations.reduce(function (acc, loc) {
-      var name = STATE_ABBR_TO_NAME[loc.state];
-      if (name) acc[name] = true;
-      return acc;
-    }, {})
-  );
+  var serviceAreaFips = locations.reduce(function (acc, loc) {
+    var fips = STATE_ABBR_TO_FIPS[loc.state];
+    if (fips) acc[fips] = true;
+    return acc;
+  }, {});
 
   var HQ_COLOR = '#3E68B2';
   var SERVICE_COLOR = '#6E8FCB';
@@ -228,7 +227,7 @@
         var statesGeoJson = topojson.feature(topology, topology.objects.states);
 
         statesGeoJson.features = statesGeoJson.features.filter(function (feature) {
-          return serviceAreaNames.indexOf(feature.properties.name) !== -1;
+          return serviceAreaFips[Number(feature.id)];
         });
 
         map.addSource('pulse-service-area', {
