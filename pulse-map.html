@@ -203,6 +203,7 @@
       var el = document.createElement('div');
       el.className = 'pulse-marker' + (isHq ? ' hq-marker' : '');
       el.innerHTML = badgeSvg(isHq ? HQ_COLOR : SERVICE_COLOR, isHq ? 'P' : null);
+      el.style.zIndex = isHq ? '10' : '1';
 
       var popup = new mapboxgl.Popup({
         offset: 18,
