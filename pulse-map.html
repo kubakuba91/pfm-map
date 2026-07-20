@@ -320,6 +320,7 @@
   map.touchZoomRotate.disableRotation();
   map.scrollZoom.disable();
   map.boxZoom.disable();
+  map.addControl(new mapboxgl.NavigationControl({ showCompass: false }), 'top-right');
 
   map.on('load', function () {
     // Markers don't depend on the state boundary fetch below, so add them
