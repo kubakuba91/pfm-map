@@ -131,6 +131,20 @@
       </svg>
       <span>Service Centers</span>
     </div>
+    <div class="pulse-map-legend-row">
+      <svg class="pulse-map-legend-swatch" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="16" cy="16" r="13" fill="#4B5563" stroke="#ffffff" stroke-width="3"/>
+        <text x="16" y="21" text-anchor="middle" font-size="14" font-weight="700" fill="#ffffff">W</text>
+      </svg>
+      <span>Warehouses</span>
+    </div>
+    <div class="pulse-map-legend-row">
+      <svg class="pulse-map-legend-swatch" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="16" cy="16" r="13" fill="#9CB3D4" stroke="#ffffff" stroke-width="3"/>
+        <text x="16" y="21" text-anchor="middle" font-size="14" font-weight="700" fill="#ffffff">F</text>
+      </svg>
+      <span>Future Locations</span>
+    </div>
   </div>
 </div>
 
@@ -142,37 +156,123 @@
   mapboxgl.accessToken = MAPBOX_TOKEN;
 
   var locations = [
-    { city: 'Anaheim',          state: 'CA', lat: 33.8647,  lng: -117.7416, type: 'hq' },
-    { city: 'Bloomington',      state: 'MN', lat: 44.8408,  lng: -93.2983,  type: 'service' },
-    { city: 'Nashville',        state: 'TN', lat: 36.1627,  lng: -86.7816,  type: 'service' },
-    { city: 'Salt Lake City',   state: 'UT', lat: 40.7608,  lng: -111.8910, type: 'service' },
-    { city: 'Knoxville',        state: 'TN', lat: 35.9606,  lng: -83.9207,  type: 'service' },
-    { city: 'Santa Fe Springs', state: 'CA', lat: 33.9472,  lng: -118.0853, type: 'service' },
-    { city: 'Denver',           state: 'CO', lat: 39.7392,  lng: -104.9903, type: 'service' },
-    { city: 'Phoenix',          state: 'AZ', lat: 33.4484,  lng: -112.0740, type: 'service' },
-    { city: 'Tracy',            state: 'CA', lat: 37.7397,  lng: -121.4252, type: 'service' },
-    { city: 'Coppell',          state: 'TX', lat: 32.9546,  lng: -97.0150,  type: 'service' },
-    { city: 'Elizabeth',        state: 'NJ', lat: 40.6639,  lng: -74.2107,  type: 'service' },
-    { city: 'Fullerton',        state: 'CA', lat: 33.8704,  lng: -117.9242, type: 'service' },
-    { city: 'Groveland',        state: 'FL', lat: 28.5586,  lng: -81.8517,  type: 'service' },
-    { city: 'Hazleton',         state: 'PA', lat: 40.9584,  lng: -75.9746,  type: 'service' },
-    { city: 'Tacoma',           state: 'WA', lat: 47.2529,  lng: -122.4443, type: 'service' },
-    { city: 'University Park',  state: 'IL', lat: 41.4428,  lng: -87.6867,  type: 'service' },
-    { city: 'Walnut',           state: 'CA', lat: 34.0203,  lng: -117.8653, type: 'service' },
-    { city: 'Dayton',           state: 'NJ', lat: 40.3765,  lng: -74.5107,  type: 'service' },
-    { city: 'Fontana',          state: 'CA', lat: 34.0922,  lng: -117.4350, type: 'service' },
-    { city: 'Portland',         state: 'OR', lat: 45.5152,  lng: -122.6784, type: 'service' },
-    { city: 'Houston',          state: 'TX', lat: 29.7604,  lng: -95.3698,  type: 'service' }
+    // Headquarters
+    { city: 'Anaheim',           state: 'CA', lat: 33.8647,    lng: -117.7416,   type: 'hq' },
+    // Service Centers
+    { city: 'Albany',            state: 'GA', lat: 31.5785,    lng: -84.1557,    type: 'service' },
+    { city: 'Albany',            state: 'NY', lat: 42.6526,    lng: -73.7562,    type: 'service' },
+    { city: 'Amherst',           state: 'NH', lat: 42.8615,    lng: -71.6253,    type: 'service' },
+    { city: 'Auburn',            state: 'WA', lat: 47.3073,    lng: -122.2285,   type: 'service' },
+    { city: 'Aurora',            state: 'CO', lat: 39.7294,    lng: -104.8319,   type: 'service' },
+    { city: 'Belle',             state: 'WV', lat: 38.2323,    lng: -81.5376,    type: 'service' },
+    { city: 'Bensenville',       state: 'IL', lat: 41.955,     lng: -87.9401,    type: 'service' },
+    { city: 'Bessemer',          state: 'AL', lat: 33.4018,    lng: -86.9544,    type: 'service' },
+    { city: 'Billerica',         state: 'MA', lat: 42.5584,    lng: -71.2689,    type: 'service' },
+    { city: 'Bloomington',       state: 'MN', lat: 44.8408,    lng: -93.2983,    type: 'service' },
+    { city: 'Brandywine',        state: 'MD', lat: 38.6968,    lng: -76.8477,    type: 'service' },
+    { city: 'Bridgeton',         state: 'MO', lat: 38.767,     lng: -90.4115,    type: 'service' },
+    { city: 'Bristol',           state: 'CT', lat: 41.6718,    lng: -72.9493,    type: 'service' },
+    { city: 'Burlington',        state: 'VT', lat: 44.4759,    lng: -73.2121,    type: 'service' },
+    { city: 'Canton',            state: 'MI', lat: 42.3086,    lng: -83.4822,    type: 'service' },
+    { city: 'Cleveland',         state: 'OH', lat: 41.4993,    lng: -81.6944,    type: 'service' },
+    { city: 'Compton',           state: 'CA', lat: 33.8958,    lng: -118.2201,   type: 'service' },
+    { city: 'Coppell',           state: 'TX', lat: 32.9546,    lng: -97.015,     type: 'service' },
+    { city: 'Dayton',            state: 'NJ', lat: 40.3765,    lng: -74.5107,    type: 'service' },
+    { city: 'Decatur',           state: 'AL', lat: 34.6059,    lng: -86.9833,    type: 'service' },
+    { city: 'Denver',            state: 'CO', lat: 39.7392,    lng: -104.8853,   type: 'service' },
+    { city: 'Denver',            state: 'CO', lat: 39.804152,  lng: -105.0428,   type: 'service' },
+    { city: 'Elizabeth',         state: 'NJ', lat: 40.6639,    lng: -74.1057,    type: 'service' },
+    { city: 'Fayetteville',      state: 'AR', lat: 36.0626,    lng: -94.1574,    type: 'service' },
+    { city: 'Fishers',           state: 'IN', lat: 39.9568,    lng: -86.0134,    type: 'service' },
+    { city: 'Fontana',           state: 'CA', lat: 34.0922,    lng: -117.435,    type: 'service' },
+    { city: 'Fort Myers',        state: 'FL', lat: 26.6406,    lng: -81.8723,    type: 'service' },
+    { city: 'Fullerton',         state: 'CA', lat: 33.8704,    lng: -117.9242,   type: 'service' },
+    { city: 'Garner',            state: 'NC', lat: 35.7113,    lng: -78.6142,    type: 'service' },
+    { city: 'Grand Rapids',      state: 'MI', lat: 42.9634,    lng: -85.6681,    type: 'service' },
+    { city: 'Grapevine',         state: 'TX', lat: 32.9343,    lng: -97.0781,    type: 'service' },
+    { city: 'Greenville',        state: 'NC', lat: 35.6127,    lng: -77.3664,    type: 'service' },
+    { city: 'Groveland',         state: 'FL', lat: 28.5586,    lng: -81.8517,    type: 'service' },
+    { city: 'Hazleton',          state: 'PA', lat: 40.9584,    lng: -75.9746,    type: 'service' },
+    { city: 'Houston',           state: 'TX', lat: 29.7604,    lng: -95.2648,    type: 'service' },
+    { city: 'Houston',           state: 'TX', lat: 29.6854,    lng: -95.3698,    type: 'service' },
+    { city: 'Irmo',              state: 'SC', lat: 34.0859,    lng: -81.1832,    type: 'service' },
+    { city: 'Irving',            state: 'TX', lat: 32.814,     lng: -96.9489,    type: 'service' },
+    { city: 'Kansas City',       state: 'MO', lat: 39.0997,    lng: -94.5786,    type: 'service' },
+    { city: 'Kernersville',      state: 'NC', lat: 36.1199,    lng: -80.0737,    type: 'service' },
+    { city: 'Knoxville',         state: 'TN', lat: 35.9606,    lng: -83.8157,    type: 'service' },
+    { city: 'Knoxville',         state: 'TN', lat: 35.9606,    lng: -84.0257,    type: 'service' },
+    { city: 'La Vergne',         state: 'TN', lat: 36.0156,    lng: -86.5819,    type: 'service' },
+    { city: 'Lakeside',          state: 'CA', lat: 32.8573,    lng: -116.9223,   type: 'service' },
+    { city: 'Livermore',         state: 'CA', lat: 37.6819,    lng: -121.768,    type: 'service' },
+    { city: 'Louisville',        state: 'KY', lat: 38.2527,    lng: -85.7585,    type: 'service' },
+    { city: 'Memphis',           state: 'TN', lat: 35.1495,    lng: -90.049,     type: 'service' },
+    { city: 'Milpitas',          state: 'CA', lat: 37.4323,    lng: -121.8996,   type: 'service' },
+    { city: 'Mission Hills',     state: 'CA', lat: 34.2572,    lng: -118.467,    type: 'service' },
+    { city: 'Montgomery',        state: 'AL', lat: 32.3668,    lng: -86.3,       type: 'service' },
+    { city: 'Monticello',        state: 'FL', lat: 30.5452,    lng: -83.8702,    type: 'service' },
+    { city: 'Mt. Juliet',        state: 'TN', lat: 36.2001,    lng: -86.5186,    type: 'service' },
+    { city: 'Nashville',         state: 'TN', lat: 36.1627,    lng: -86.7816,    type: 'service' },
+    { city: 'North Jackson',     state: 'OH', lat: 41.0978,    lng: -80.8576,    type: 'service' },
+    { city: 'North Las Vegas',   state: 'NV', lat: 36.1989,    lng: -115.1175,   type: 'service' },
+    { city: 'Oakdale',           state: 'PA', lat: 40.3981,    lng: -80.1859,    type: 'service' },
+    { city: 'Omaha',             state: 'NE', lat: 41.2565,    lng: -95.9345,    type: 'service' },
+    { city: 'Orlando',           state: 'FL', lat: 28.5383,    lng: -81.4842,    type: 'service' },
+    { city: 'Phoenix',           state: 'AZ', lat: 33.4484,    lng: -111.969,    type: 'service' },
+    { city: 'Phoenix',           state: 'AZ', lat: 33.5234,    lng: -112.074,    type: 'service' },
+    { city: 'Phoenix',           state: 'AZ', lat: 33.3734,    lng: -112.074,    type: 'service' },
+    { city: 'Portsmouth',        state: 'VA', lat: 36.8354,    lng: -76.2983,    type: 'service' },
+    { city: 'Redlands',          state: 'CA', lat: 34.0556,    lng: -117.1825,   type: 'service' },
+    { city: 'Richland',          state: 'MS', lat: 32.239,     lng: -90.1584,    type: 'service' },
+    { city: 'Rincon',            state: 'GA', lat: 32.296,     lng: -81.2354,    type: 'service' },
+    { city: 'Riverview',         state: 'FL', lat: 27.8661,    lng: -82.3265,    type: 'service' },
+    { city: 'Robbinsville',      state: 'NJ', lat: 40.2146,    lng: -74.6193,    type: 'service' },
+    { city: 'Rochester',         state: 'NY', lat: 43.1566,    lng: -77.6088,    type: 'service' },
+    { city: 'Roswell',           state: 'GA', lat: 34.0232,    lng: -84.3616,    type: 'service' },
+    { city: 'Sacramento',        state: 'CA', lat: 38.5816,    lng: -121.3894,   type: 'service' },
+    { city: 'Salt Lake City',    state: 'UT', lat: 40.7608,    lng: -111.786,    type: 'service' },
+    { city: 'Salt Lake City',    state: 'UT', lat: 40.832129,  lng: -111.858553, type: 'service' },
+    { city: 'Salt Lake City',    state: 'UT', lat: 40.68947,   lng: -111.858553, type: 'service' },
+    { city: 'San Antonio',       state: 'TX', lat: 29.4241,    lng: -98.4936,    type: 'service' },
+    { city: 'Santa Fe Springs',  state: 'CA', lat: 33.9472,    lng: -118.0853,   type: 'service' },
+    { city: 'Savannah',          state: 'GA', lat: 32.0809,    lng: -81.0912,    type: 'service' },
+    { city: 'Sharon Hill',       state: 'PA', lat: 39.9065,    lng: -75.2719,    type: 'service' },
+    { city: 'Shawnee',           state: 'KS', lat: 39.0417,    lng: -94.7202,    type: 'service' },
+    { city: 'Sidney',            state: 'ME', lat: 44.4137,    lng: -69.7281,    type: 'service' },
+    { city: 'Springdale',        state: 'OH', lat: 39.287,     lng: -84.4852,    type: 'service' },
+    { city: 'St. Rose',          state: 'LA', lat: 29.9469,    lng: -90.3231,    type: 'service' },
+    { city: 'Tacoma',            state: 'WA', lat: 47.2529,    lng: -122.4443,   type: 'service' },
+    { city: 'Tampa',             state: 'FL', lat: 27.9506,    lng: -82.4572,    type: 'service' },
+    { city: 'Tolleson',          state: 'AZ', lat: 33.45,      lng: -112.2593,   type: 'service' },
+    { city: 'Tracy',             state: 'CA', lat: 37.7397,    lng: -121.3202,   type: 'service' },
+    { city: 'Tracy',             state: 'CA', lat: 37.7397,    lng: -121.5302,   type: 'service' },
+    { city: 'University Park',   state: 'IL', lat: 41.4428,    lng: -87.6867,    type: 'service' },
+    { city: 'Walnut',            state: 'CA', lat: 34.0203,    lng: -117.8653,   type: 'service' },
+    { city: 'Welford',           state: 'SC', lat: 34.9501,    lng: -82.1059,    type: 'service' },
+    { city: 'Wilmington',        state: 'NC', lat: 34.2257,    lng: -77.9447,    type: 'service' },
+    // Warehouses
+    { city: 'Atlanta',           state: 'GA', lat: 33.749,     lng: -84.388,     type: 'warehouse' },
+    { city: 'Charlotte',         state: 'NC', lat: 35.2271,    lng: -80.8431,    type: 'warehouse' },
+    { city: 'Elizabeth',         state: 'NJ', lat: 40.6639,    lng: -74.3157,    type: 'warehouse' },
+    { city: 'Hicksville',        state: 'NY', lat: 40.7684,    lng: -73.5251,    type: 'warehouse' },
+    { city: 'Jacksonville',      state: 'FL', lat: 30.3322,    lng: -81.6557,    type: 'warehouse' },
+    { city: 'La Mirada',         state: 'CA', lat: 33.9172,    lng: -118.012,    type: 'warehouse' },
+    { city: 'Orlando',           state: 'FL', lat: 28.5383,    lng: -81.2742,    type: 'warehouse' },
+    { city: 'Pembroke Park',     state: 'FL', lat: 25.9873,    lng: -80.1748,    type: 'warehouse' },
+    { city: 'Raleigh',           state: 'NC', lat: 35.7796,    lng: -78.6382,    type: 'warehouse' },
+    { city: 'Taunton',           state: 'MA', lat: 41.9001,    lng: -71.0898,    type: 'warehouse' },
+    { city: 'Teterboro',         state: 'NJ', lat: 40.8598,    lng: -74.0593,    type: 'warehouse' },
+    // Future Locations
+    { city: 'Baltimore',         state: 'MD', lat: 39.2904,    lng: -76.6122,    type: 'future' },
+    { city: 'Denver',            state: 'CO', lat: 39.674248,  lng: -105.0428,   type: 'future' },
+    { city: 'Houston',           state: 'TX', lat: 29.8354,    lng: -95.3698,    type: 'future' },
+    { city: 'Houston',           state: 'TX', lat: 29.7604,    lng: -95.4748,    type: 'future' },
+    { city: 'Phoenix',           state: 'AZ', lat: 33.4484,    lng: -112.179,    type: 'future' },
+    { city: 'Portland',          state: 'OR', lat: 45.5152,    lng: -122.6784,   type: 'future' },
+    { city: 'Sacramento',        state: 'CA', lat: 38.5816,    lng: -121.5994,   type: 'future' },
+    { city: 'Salt Lake City',    state: 'UT', lat: 40.804884,  lng: -111.975947, type: 'future' },
+    { city: 'Salt Lake City',    state: 'UT', lat: 40.716716,  lng: -111.975947, type: 'future' },
+    { city: 'St. Louis',         state: 'MO', lat: 38.627,     lng: -90.1994,    type: 'future' }
   ];
-
-  // Dedupe on city+state, just in case.
-  var seen = {};
-  locations = locations.filter(function (loc) {
-    var key = loc.city + '|' + loc.state;
-    if (seen[key]) return false;
-    seen[key] = true;
-    return true;
-  });
 
   // us-atlas's states-10m.json identifies states by FIPS code (the
   // feature's `id`), not by a `properties.name` string.
@@ -188,8 +288,10 @@
     return acc;
   }, {});
 
-  var HQ_COLOR = '#3E68B2';
-  var SERVICE_COLOR = '#6E8FCB';
+  var HQ_COLOR       = '#3E68B2';
+  var SERVICE_COLOR  = '#6E8FCB';
+  var WAREHOUSE_COLOR = '#4B5563';
+  var FUTURE_COLOR   = '#9CB3D4';
 
   function badgeSvg(color, label) {
     var inner = label
@@ -223,11 +325,13 @@
     // Markers don't depend on the state boundary fetch below, so add them
     // immediately — a slow/blocked CDN request shouldn't hide the pins.
     locations.forEach(function (loc) {
-      var isHq = loc.type === 'hq';
+      var colorMap  = { hq: HQ_COLOR, service: SERVICE_COLOR, warehouse: WAREHOUSE_COLOR, future: FUTURE_COLOR };
+      var labelMap  = { hq: 'P', service: null, warehouse: 'W', future: 'F' };
+      var zMap      = { hq: 10, warehouse: 5, service: 2, future: 1 };
       var el = document.createElement('div');
-      el.className = 'pulse-marker' + (isHq ? ' hq-marker' : '');
-      el.innerHTML = badgeSvg(isHq ? HQ_COLOR : SERVICE_COLOR, isHq ? 'P' : null);
-      el.style.zIndex = isHq ? '10' : '1';
+      el.className = 'pulse-marker' + (loc.type === 'hq' ? ' hq-marker' : '');
+      el.innerHTML = badgeSvg(colorMap[loc.type] || SERVICE_COLOR, labelMap[loc.type]);
+      el.style.zIndex = zMap[loc.type] || '1';
 
       var popup = new mapboxgl.Popup({
         offset: 18,
