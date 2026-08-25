@@ -98,35 +98,44 @@
   /* ── Inset maps (Alaska & Hawaii) ─────────────────────────────── */
   .pulse-map-insets {
     position: absolute;
-    right: 16px;
+    left: 16px;
     bottom: 24px;
     z-index: 20;
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
+    align-items: flex-end;
     gap: 8px;
+    /* shift right of the legend (legend min-width 170px + padding) */
+    margin-left: 198px;
   }
   .pulse-map-inset {
     position: relative;
-    background: rgba(255, 255, 255, 0.92);
+    background: #f5f5f5;
     border-radius: 6px;
     box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
     overflow: hidden;
+    border: 1px solid rgba(62, 104, 178, 0.3);
   }
-  #pulse-map-ak { width: 160px; height: 110px; }
-  #pulse-map-hi { width: 120px; height: 85px; }
+  #pulse-map-ak { width: 180px; height: 130px; }
+  #pulse-map-hi { width: 150px; height: 110px; }
+  /* Hide the Mapbox logo and attribution inside insets */
+  .pulse-map-inset .mapboxgl-ctrl-logo,
+  .pulse-map-inset .mapboxgl-ctrl-attrib,
+  .pulse-map-inset .mapboxgl-ctrl-bottom-right,
+  .pulse-map-inset .mapboxgl-ctrl-bottom-left { display: none !important; }
   .pulse-map-inset-label {
     position: absolute;
-    bottom: 4px;
-    left: 6px;
+    bottom: 5px;
+    left: 7px;
     z-index: 5;
     font-size: 10px;
     font-weight: 700;
     color: #1f2733;
-    background: rgba(255, 255, 255, 0.78);
+    background: rgba(255, 255, 255, 0.85);
     border-radius: 3px;
-    padding: 1px 4px;
+    padding: 1px 5px;
     pointer-events: none;
-    line-height: 1.4;
+    line-height: 1.5;
   }
   @media (max-width: 600px) {
     .pulse-marker {
@@ -453,8 +462,10 @@
   var mapAK = new mapboxgl.Map({
     container: 'pulse-map-ak',
     style: 'mapbox://styles/mapbox/light-v11',
-    center: [-153, 64],
-    zoom: 2.6,
+    // Center on geographic middle of Alaska; zoom chosen so the whole
+    // state fits in a 180×130 px box.
+    center: [-153, 63],
+    zoom: 2.45,
     interactive: false,
     attributionControl: false
   });
@@ -480,8 +491,10 @@
   var mapHI = new mapboxgl.Map({
     container: 'pulse-map-hi',
     style: 'mapbox://styles/mapbox/light-v11',
+    // Center between Big Island and Kauai; zoom so the main island
+    // chain fits in a 150×110 px box without showing the Caribbean.
     center: [-157.5, 20.5],
-    zoom: 5.2,
+    zoom: 4.15,
     interactive: false,
     attributionControl: false
   });
