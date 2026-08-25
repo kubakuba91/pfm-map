@@ -31,11 +31,18 @@
   .mapboxgl-ctrl-group button {
     cursor: pointer;
   }
-  .pulse-map-legend {
+  /* ── Bottom bar: legend + inset maps side by side ─────────────── */
+  .pulse-map-bottom {
     position: absolute;
     left: 16px;
     bottom: 24px;
     z-index: 20;
+    display: flex;
+    flex-direction: row;
+    align-items: flex-end;
+    gap: 8px;
+  }
+  .pulse-map-legend {
     background: rgba(255, 255, 255, 0.92);
     border-radius: 6px;
     box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
@@ -43,7 +50,8 @@
     font-size: 13px;
     line-height: 1.6;
     color: #1f2733;
-    min-width: 170px;
+    width: 190px;
+    flex: 0 0 190px;
   }
   .pulse-map-legend h4 {
     margin: 0 0 8px 0;
@@ -97,43 +105,37 @@
   }
   /* ── Inset maps (Alaska & Hawaii) ─────────────────────────────── */
   .pulse-map-insets {
-    position: absolute;
-    left: 16px;
-    bottom: 24px;
-    z-index: 20;
     display: flex;
     flex-direction: row;
-    align-items: flex-end;
     gap: 8px;
-    /* shift right of the legend (legend min-width 170px + padding) */
-    margin-left: 198px;
   }
   .pulse-map-inset {
     position: relative;
-    background: #f5f5f5;
     border-radius: 6px;
     box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
     overflow: hidden;
-    border: 1px solid rgba(62, 104, 178, 0.3);
+    border: 1px solid rgba(62, 104, 178, 0.25);
+    background: #eef1f5;
   }
-  #pulse-map-ak { width: 180px; height: 130px; }
-  #pulse-map-hi { width: 150px; height: 110px; }
-  /* Hide the Mapbox logo and attribution inside insets */
+  /* Same card width as the legend */
+  #pulse-map-ak { width: 190px; height: 155px; }
+  #pulse-map-hi { width: 190px; height: 155px; }
+  /* Hide Mapbox logo and attribution inside insets */
   .pulse-map-inset .mapboxgl-ctrl-logo,
   .pulse-map-inset .mapboxgl-ctrl-attrib,
   .pulse-map-inset .mapboxgl-ctrl-bottom-right,
   .pulse-map-inset .mapboxgl-ctrl-bottom-left { display: none !important; }
   .pulse-map-inset-label {
     position: absolute;
-    bottom: 5px;
+    bottom: 6px;
     left: 7px;
     z-index: 5;
-    font-size: 10px;
+    font-size: 11px;
     font-weight: 700;
     color: #1f2733;
-    background: rgba(255, 255, 255, 0.85);
+    background: rgba(255, 255, 255, 0.88);
     border-radius: 3px;
-    padding: 1px 5px;
+    padding: 1px 6px;
     pointer-events: none;
     line-height: 1.5;
   }
@@ -158,6 +160,9 @@
       width: 22px;
       height: 22px;
     }
+    /* Hide insets on mobile — too small to be useful */
+    .pulse-map-insets { display: none; }
+    .pulse-map-legend { width: auto; flex: 0 0 auto; }
   }
 </style>
 </head>
@@ -166,46 +171,48 @@
 <!-- SQUARESPACE EMBED: start here -->
 <div id="pulse-map-embed">
   <div id="pulse-map-container"></div>
-  <div class="pulse-map-legend">
-    <h4>Pulse Final Mile</h4>
-    <div class="pulse-map-legend-row">
-      <svg class="pulse-map-legend-swatch" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
-        <circle cx="16" cy="16" r="13" fill="#3E68B2" stroke="#ffffff" stroke-width="3"/>
-        <text x="16" y="21" text-anchor="middle" font-size="14" font-weight="700" fill="#ffffff">P</text>
-      </svg>
-      <span>Headquarters</span>
+  <div class="pulse-map-bottom">
+    <div class="pulse-map-legend">
+      <h4>Pulse Final Mile</h4>
+      <div class="pulse-map-legend-row">
+        <svg class="pulse-map-legend-swatch" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="16" cy="16" r="13" fill="#3E68B2" stroke="#ffffff" stroke-width="3"/>
+          <text x="16" y="21" text-anchor="middle" font-size="14" font-weight="700" fill="#ffffff">P</text>
+        </svg>
+        <span>Headquarters</span>
+      </div>
+      <div class="pulse-map-legend-row">
+        <svg class="pulse-map-legend-swatch" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="16" cy="16" r="13" fill="#6E8FCB" stroke="#ffffff" stroke-width="3"/>
+          <circle cx="16" cy="16" r="4" fill="#ffffff"/>
+        </svg>
+        <span>Service Centers</span>
+      </div>
+      <div class="pulse-map-legend-row">
+        <svg class="pulse-map-legend-swatch" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="16" cy="16" r="13" fill="#4B5563" stroke="#ffffff" stroke-width="3"/>
+          <text x="16" y="21" text-anchor="middle" font-size="14" font-weight="700" fill="#ffffff">W</text>
+        </svg>
+        <span>Warehouses</span>
+      </div>
+      <div class="pulse-map-legend-row">
+        <svg class="pulse-map-legend-swatch" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="16" cy="16" r="13" fill="#9CB3D4" stroke="#ffffff" stroke-width="3"/>
+          <text x="16" y="21" text-anchor="middle" font-size="14" font-weight="700" fill="#ffffff">F</text>
+        </svg>
+        <span>Future Locations</span>
+      </div>
     </div>
-    <div class="pulse-map-legend-row">
-      <svg class="pulse-map-legend-swatch" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
-        <circle cx="16" cy="16" r="13" fill="#6E8FCB" stroke="#ffffff" stroke-width="3"/>
-        <circle cx="16" cy="16" r="4" fill="#ffffff"/>
-      </svg>
-      <span>Service Centers</span>
-    </div>
-    <div class="pulse-map-legend-row">
-      <svg class="pulse-map-legend-swatch" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
-        <circle cx="16" cy="16" r="13" fill="#4B5563" stroke="#ffffff" stroke-width="3"/>
-        <text x="16" y="21" text-anchor="middle" font-size="14" font-weight="700" fill="#ffffff">W</text>
-      </svg>
-      <span>Warehouses</span>
-    </div>
-    <div class="pulse-map-legend-row">
-      <svg class="pulse-map-legend-swatch" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
-        <circle cx="16" cy="16" r="13" fill="#9CB3D4" stroke="#ffffff" stroke-width="3"/>
-        <text x="16" y="21" text-anchor="middle" font-size="14" font-weight="700" fill="#ffffff">F</text>
-      </svg>
-      <span>Future Locations</span>
-    </div>
-  </div>
-  <!-- Inset maps -->
-  <div class="pulse-map-insets">
-    <div class="pulse-map-inset">
-      <div id="pulse-map-ak"></div>
-      <span class="pulse-map-inset-label">Alaska</span>
-    </div>
-    <div class="pulse-map-inset">
-      <div id="pulse-map-hi"></div>
-      <span class="pulse-map-inset-label">Hawaii</span>
+    <!-- Inset maps -->
+    <div class="pulse-map-insets">
+      <div class="pulse-map-inset">
+        <div id="pulse-map-ak"></div>
+        <span class="pulse-map-inset-label">Alaska</span>
+      </div>
+      <div class="pulse-map-inset">
+        <div id="pulse-map-hi"></div>
+        <span class="pulse-map-inset-label">Hawaii</span>
+      </div>
     </div>
   </div>
 </div>
@@ -462,10 +469,11 @@
   var mapAK = new mapboxgl.Map({
     container: 'pulse-map-ak',
     style: 'mapbox://styles/mapbox/light-v11',
-    // Center on geographic middle of Alaska; zoom chosen so the whole
-    // state fits in a 180×130 px box.
-    center: [-153, 63],
-    zoom: 2.45,
+    // Bounding box of Alaska (main body + Aleutians, ignoring antimeridian
+    // overflow): ~130°W–172°W, 55°N–71.5°N.  Center ≈ [-151, 63.5].
+    // Zoom 2.5 fits the full ~42° longitude and ~16° latitude span in 190×155 px.
+    center: [-151, 63.5],
+    zoom: 2.5,
     interactive: false,
     attributionControl: false
   });
@@ -491,10 +499,10 @@
   var mapHI = new mapboxgl.Map({
     container: 'pulse-map-hi',
     style: 'mapbox://styles/mapbox/light-v11',
-    // Center between Big Island and Kauai; zoom so the main island
-    // chain fits in a 150×110 px box without showing the Caribbean.
-    center: [-157.5, 20.5],
-    zoom: 4.15,
+    // Hawaii main islands: ~154.8°W–160.2°W, ~18.9°N–22.2°N.
+    // Zoom 4.3 fits the chain in a 190×155 px box with small margins.
+    center: [-157.5, 20.7],
+    zoom: 4.3,
     interactive: false,
     attributionControl: false
   });
