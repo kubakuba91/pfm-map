@@ -95,6 +95,39 @@
     width: 30px;
     height: 30px;
   }
+  /* ── Inset maps (Alaska & Hawaii) ─────────────────────────────── */
+  .pulse-map-insets {
+    position: absolute;
+    right: 16px;
+    bottom: 24px;
+    z-index: 20;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .pulse-map-inset {
+    position: relative;
+    background: rgba(255, 255, 255, 0.92);
+    border-radius: 6px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+    overflow: hidden;
+  }
+  #pulse-map-ak { width: 160px; height: 110px; }
+  #pulse-map-hi { width: 120px; height: 85px; }
+  .pulse-map-inset-label {
+    position: absolute;
+    bottom: 4px;
+    left: 6px;
+    z-index: 5;
+    font-size: 10px;
+    font-weight: 700;
+    color: #1f2733;
+    background: rgba(255, 255, 255, 0.78);
+    border-radius: 3px;
+    padding: 1px 4px;
+    pointer-events: none;
+    line-height: 1.4;
+  }
   @media (max-width: 600px) {
     .pulse-marker {
       width: 32px;
@@ -153,6 +186,17 @@
         <text x="16" y="21" text-anchor="middle" font-size="14" font-weight="700" fill="#ffffff">F</text>
       </svg>
       <span>Future Locations</span>
+    </div>
+  </div>
+  <!-- Inset maps -->
+  <div class="pulse-map-insets">
+    <div class="pulse-map-inset">
+      <div id="pulse-map-ak"></div>
+      <span class="pulse-map-inset-label">Alaska</span>
+    </div>
+    <div class="pulse-map-inset">
+      <div id="pulse-map-hi"></div>
+      <span class="pulse-map-inset-label">Hawaii</span>
     </div>
   </div>
 </div>
@@ -331,9 +375,53 @@
   map.boxZoom.disable();
   map.addControl(new mapboxgl.NavigationControl({ showCompass: false }), 'top-right');
 
+  // ── Shared topology fetch (reused by main map + both insets) ────────
+  var topologyPromise = fetch('https://cdn.jsdelivr.net/npm/us-atlas@3/states-10m.json')
+    .then(function (res) { return res.json(); })
+    .catch(function (err) {
+      console.error('Pulse map: failed to load state boundary data', err);
+      return null;
+    });
+
+  // Adds fill + merged-border layers for a given set of FIPS codes to any
+  // mapboxgl.Map instance.  `idSuffix` keeps source/layer ids unique.
+  function addStateLayers(mapInstance, topology, fipsSet, idSuffix) {
+    if (!topology) return;
+    var allGeoms = topology.objects.states.geometries;
+
+    // Fill layer (individual state polygons so every state is shaded)
+    var filteredFeatureCollection = topojson.feature(topology, {
+      type: 'GeometryCollection',
+      geometries: allGeoms.filter(function (g) { return fipsSet[Number(g.id)]; })
+    });
+    mapInstance.addSource('psa-' + idSuffix, { type: 'geojson', data: filteredFeatureCollection });
+    mapInstance.addLayer({
+      id: 'psa-fill-' + idSuffix,
+      type: 'fill',
+      source: 'psa-' + idSuffix,
+      paint: { 'fill-color': '#8FA9D6', 'fill-opacity': 0.45 }
+    });
+
+    // Merged border (outer perimeter only, no internal seams)
+    var mergedBorder = topojson.merge(
+      topology,
+      allGeoms.filter(function (g) { return fipsSet[Number(g.id)]; })
+    );
+    mapInstance.addSource('psa-outline-' + idSuffix, {
+      type: 'geojson',
+      data: { type: 'Feature', geometry: mergedBorder, properties: {} }
+    });
+    mapInstance.addLayer({
+      id: 'psa-border-' + idSuffix,
+      type: 'line',
+      source: 'psa-outline-' + idSuffix,
+      paint: { 'line-color': '#3E68B2', 'line-opacity': 0.8, 'line-width': 1.5 }
+    });
+  }
+
+  // ── Main map ─────────────────────────────────────────────────────────
   map.on('load', function () {
-    // Markers don't depend on the state boundary fetch below, so add them
-    // immediately — a slow/blocked CDN request shouldn't hide the pins.
+    // Markers fire immediately — don't block on the topology fetch.
     locations.forEach(function (loc) {
       var colorMap  = { hq: HQ_COLOR, service: SERVICE_COLOR, warehouse: WAREHOUSE_COLOR, future: FUTURE_COLOR };
       var labelMap  = { hq: 'P', service: null, warehouse: 'W', future: 'F' };
@@ -356,60 +444,63 @@
         .addTo(map);
     });
 
-    fetch('https://cdn.jsdelivr.net/npm/us-atlas@3/states-10m.json')
-      .then(function (res) { return res.json(); })
-      .then(function (topology) {
-        var statesGeoJson = topojson.feature(topology, topology.objects.states);
+    topologyPromise.then(function (topology) {
+      addStateLayers(map, topology, serviceAreaFips, 'main');
+    });
+  });
 
-        statesGeoJson.features = statesGeoJson.features.filter(function (feature) {
-          return serviceAreaFips[Number(feature.id)];
-        });
-
-        map.addSource('pulse-service-area', {
-          type: 'geojson',
-          data: statesGeoJson
-        });
-
-        // Insert below the marker layer (markers are DOM elements, not a
-        // GL layer, so this just keeps the fill/border under any future
-        // GL layers and the base style's place labels).
-        map.addLayer({
-          id: 'pulse-service-area-fill',
-          type: 'fill',
-          source: 'pulse-service-area',
-          paint: {
-            'fill-color': '#8FA9D6',
-            'fill-opacity': 0.45
-          }
-        });
-
-        // Merge the filtered state geometries into one shape so the line
-        // layer only traces the outer perimeter of the service area,
-        // skipping the seams between adjacent highlighted states.
-        var filteredGeometries = topology.objects.states.geometries.filter(function (geometry) {
-          return serviceAreaFips[Number(geometry.id)];
-        });
-        var mergedBorder = topojson.merge(topology, filteredGeometries);
-
-        map.addSource('pulse-service-area-outline', {
-          type: 'geojson',
-          data: { type: 'Feature', geometry: mergedBorder, properties: {} }
-        });
-
-        map.addLayer({
-          id: 'pulse-service-area-border',
-          type: 'line',
-          source: 'pulse-service-area-outline',
-          paint: {
-            'line-color': '#3E68B2',
-            'line-opacity': 0.8,
-            'line-width': 1.5
-          }
-        });
-      })
-      .catch(function (err) {
-        console.error('Pulse map: failed to load state boundary data', err);
+  // ── Alaska inset ──────────────────────────────────────────────────────
+  var mapAK = new mapboxgl.Map({
+    container: 'pulse-map-ak',
+    style: 'mapbox://styles/mapbox/light-v11',
+    center: [-153, 64],
+    zoom: 2.6,
+    interactive: false,
+    attributionControl: false
+  });
+  mapAK.on('load', function () {
+    topologyPromise.then(function (topology) {
+      addStateLayers(mapAK, topology, { 2: true }, 'ak');
+      // Add any AK location markers
+      locations.filter(function (l) { return l.state === 'AK'; }).forEach(function (loc) {
+        var el = document.createElement('div');
+        el.className = 'pulse-marker' + (loc.type === 'hq' ? ' hq-marker' : '');
+        el.innerHTML = badgeSvg(
+          { hq: HQ_COLOR, service: SERVICE_COLOR, warehouse: WAREHOUSE_COLOR, future: FUTURE_COLOR }[loc.type] || SERVICE_COLOR,
+          { hq: 'P', service: null, warehouse: 'W', future: 'F' }[loc.type]
+        );
+        new mapboxgl.Marker({ element: el, anchor: 'center' })
+          .setLngLat([loc.lng, loc.lat])
+          .addTo(mapAK);
       });
+    });
+  });
+
+  // ── Hawaii inset ──────────────────────────────────────────────────────
+  var mapHI = new mapboxgl.Map({
+    container: 'pulse-map-hi',
+    style: 'mapbox://styles/mapbox/light-v11',
+    center: [-157.5, 20.5],
+    zoom: 5.2,
+    interactive: false,
+    attributionControl: false
+  });
+  mapHI.on('load', function () {
+    topologyPromise.then(function (topology) {
+      addStateLayers(mapHI, topology, { 15: true }, 'hi');
+      // Add any HI location markers
+      locations.filter(function (l) { return l.state === 'HI'; }).forEach(function (loc) {
+        var el = document.createElement('div');
+        el.className = 'pulse-marker' + (loc.type === 'hq' ? ' hq-marker' : '');
+        el.innerHTML = badgeSvg(
+          { hq: HQ_COLOR, service: SERVICE_COLOR, warehouse: WAREHOUSE_COLOR, future: FUTURE_COLOR }[loc.type] || SERVICE_COLOR,
+          { hq: 'P', service: null, warehouse: 'W', future: 'F' }[loc.type]
+        );
+        new mapboxgl.Marker({ element: el, anchor: 'center' })
+          .setLngLat([loc.lng, loc.lat])
+          .addTo(mapHI);
+      });
+    });
   });
 })();
 </script>
