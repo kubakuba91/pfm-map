@@ -348,11 +348,10 @@
   // us-atlas's states-10m.json identifies states by FIPS code (the
   // feature's `id`), not by a `properties.name` string.
   // Every US state is highlighted except Montana (30) and North Dakota (38).
-  // Puerto Rico (72) is also included as a service territory.
   var SERVICE_AREA_STATE_FIPS = [
     1, 2, 4, 5, 6, 8, 9, 10, 12, 13, 15, 16, 17, 18, 19, 20, 21, 22, 23,
     24, 25, 26, 27, 28, 29, 31, 32, 33, 34, 35, 36, 37, 39, 40, 41, 42,
-    44, 45, 46, 47, 48, 49, 50, 51, 53, 54, 55, 56, 72
+    44, 45, 46, 47, 48, 49, 50, 51, 53, 54, 55, 56
   ];
 
   var serviceAreaFips = SERVICE_AREA_STATE_FIPS.reduce(function (acc, fips) {
@@ -539,7 +538,7 @@
   });
   mapPR.on('load', function () {
     topologyPromise.then(function (topology) {
-      addStateLayers(mapPR, topology, { 72: true }, 'pr');
+      // PR is shown unhighlighted — no fill layer, just the base map.
       locations.filter(function (l) { return l.state === 'PR'; }).forEach(function (loc) {
         var el = document.createElement('div');
         el.className = 'pulse-marker' + (loc.type === 'hq' ? ' hq-marker' : '');
