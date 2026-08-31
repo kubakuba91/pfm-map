@@ -31,18 +31,12 @@
   .mapboxgl-ctrl-group button {
     cursor: pointer;
   }
-  /* ── Bottom bar: legend + inset maps side by side ─────────────── */
-  .pulse-map-bottom {
+  /* ── Legend (bottom-right) ────────────────────────────────────── */
+  .pulse-map-legend {
     position: absolute;
-    left: 16px;
+    right: 16px;
     bottom: 24px;
     z-index: 20;
-    display: flex;
-    flex-direction: row;
-    align-items: flex-end;
-    gap: 8px;
-  }
-  .pulse-map-legend {
     background: rgba(255, 255, 255, 0.92);
     border-radius: 6px;
     box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
@@ -50,8 +44,7 @@
     font-size: 13px;
     line-height: 1.6;
     color: #1f2733;
-    width: 190px;
-    flex: 0 0 190px;
+    min-width: 170px;
   }
   .pulse-map-legend h4 {
     margin: 0 0 8px 0;
@@ -103,10 +96,15 @@
     width: 30px;
     height: 30px;
   }
-  /* ── Inset maps (Alaska & Hawaii) ─────────────────────────────── */
+  /* ── Inset maps (Alaska, Hawaii, Puerto Rico) — bottom-left ───── */
   .pulse-map-insets {
+    position: absolute;
+    left: 16px;
+    bottom: 24px;
+    z-index: 20;
     display: flex;
     flex-direction: row;
+    align-items: flex-end;
     gap: 8px;
   }
   .pulse-map-inset {
@@ -117,9 +115,10 @@
     border: 1px solid rgba(62, 104, 178, 0.25);
     background: #eef1f5;
   }
-  /* Same card width as the legend */
-  #pulse-map-ak { width: 190px; height: 155px; }
-  #pulse-map-hi { width: 190px; height: 155px; }
+  /* All three insets same size */
+  #pulse-map-ak,
+  #pulse-map-hi,
+  #pulse-map-pr { width: 160px; height: 130px; }
   /* Hide Mapbox logo and attribution inside insets */
   .pulse-map-inset .mapboxgl-ctrl-logo,
   .pulse-map-inset .mapboxgl-ctrl-attrib,
@@ -162,7 +161,7 @@
     }
     /* Hide insets on mobile — too small to be useful */
     .pulse-map-insets { display: none; }
-    .pulse-map-legend { width: auto; flex: 0 0 auto; }
+    .pulse-map-legend { right: 8px; bottom: 8px; }
   }
 </style>
 </head>
@@ -171,48 +170,51 @@
 <!-- SQUARESPACE EMBED: start here -->
 <div id="pulse-map-embed">
   <div id="pulse-map-container"></div>
-  <div class="pulse-map-bottom">
-    <div class="pulse-map-legend">
-      <h4>Pulse Final Mile</h4>
-      <div class="pulse-map-legend-row">
-        <svg class="pulse-map-legend-swatch" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
-          <circle cx="16" cy="16" r="13" fill="#3E68B2" stroke="#ffffff" stroke-width="3"/>
-          <text x="16" y="21" text-anchor="middle" font-size="14" font-weight="700" fill="#ffffff">P</text>
-        </svg>
-        <span>Headquarters</span>
-      </div>
-      <div class="pulse-map-legend-row">
-        <svg class="pulse-map-legend-swatch" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
-          <circle cx="16" cy="16" r="13" fill="#6E8FCB" stroke="#ffffff" stroke-width="3"/>
-          <circle cx="16" cy="16" r="4" fill="#ffffff"/>
-        </svg>
-        <span>Service Centers</span>
-      </div>
-      <div class="pulse-map-legend-row">
-        <svg class="pulse-map-legend-swatch" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
-          <circle cx="16" cy="16" r="13" fill="#4B5563" stroke="#ffffff" stroke-width="3"/>
-          <text x="16" y="21" text-anchor="middle" font-size="14" font-weight="700" fill="#ffffff">W</text>
-        </svg>
-        <span>Warehouses</span>
-      </div>
-      <div class="pulse-map-legend-row">
-        <svg class="pulse-map-legend-swatch" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
-          <circle cx="16" cy="16" r="13" fill="#9CB3D4" stroke="#ffffff" stroke-width="3"/>
-          <text x="16" y="21" text-anchor="middle" font-size="14" font-weight="700" fill="#ffffff">F</text>
-        </svg>
-        <span>Future Locations</span>
-      </div>
+  <!-- Inset maps: left-aligned along the bottom -->
+  <div class="pulse-map-insets">
+    <div class="pulse-map-inset">
+      <div id="pulse-map-ak"></div>
+      <span class="pulse-map-inset-label">Alaska</span>
     </div>
-    <!-- Inset maps -->
-    <div class="pulse-map-insets">
-      <div class="pulse-map-inset">
-        <div id="pulse-map-ak"></div>
-        <span class="pulse-map-inset-label">Alaska</span>
-      </div>
-      <div class="pulse-map-inset">
-        <div id="pulse-map-hi"></div>
-        <span class="pulse-map-inset-label">Hawaii</span>
-      </div>
+    <div class="pulse-map-inset">
+      <div id="pulse-map-hi"></div>
+      <span class="pulse-map-inset-label">Hawaii</span>
+    </div>
+    <div class="pulse-map-inset">
+      <div id="pulse-map-pr"></div>
+      <span class="pulse-map-inset-label">Puerto Rico</span>
+    </div>
+  </div>
+  <!-- Legend: bottom-right -->
+  <div class="pulse-map-legend">
+    <h4>Pulse Final Mile</h4>
+    <div class="pulse-map-legend-row">
+      <svg class="pulse-map-legend-swatch" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="16" cy="16" r="13" fill="#3E68B2" stroke="#ffffff" stroke-width="3"/>
+        <text x="16" y="21" text-anchor="middle" font-size="14" font-weight="700" fill="#ffffff">P</text>
+      </svg>
+      <span>Headquarters</span>
+    </div>
+    <div class="pulse-map-legend-row">
+      <svg class="pulse-map-legend-swatch" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="16" cy="16" r="13" fill="#6E8FCB" stroke="#ffffff" stroke-width="3"/>
+        <circle cx="16" cy="16" r="4" fill="#ffffff"/>
+      </svg>
+      <span>Service Centers</span>
+    </div>
+    <div class="pulse-map-legend-row">
+      <svg class="pulse-map-legend-swatch" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="16" cy="16" r="13" fill="#4B5563" stroke="#ffffff" stroke-width="3"/>
+        <text x="16" y="21" text-anchor="middle" font-size="14" font-weight="700" fill="#ffffff">W</text>
+      </svg>
+      <span>Warehouses</span>
+    </div>
+    <div class="pulse-map-legend-row">
+      <svg class="pulse-map-legend-swatch" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="16" cy="16" r="13" fill="#9CB3D4" stroke="#ffffff" stroke-width="3"/>
+        <text x="16" y="21" text-anchor="middle" font-size="14" font-weight="700" fill="#ffffff">F</text>
+      </svg>
+      <span>Future Locations</span>
     </div>
   </div>
 </div>
@@ -346,10 +348,11 @@
   // us-atlas's states-10m.json identifies states by FIPS code (the
   // feature's `id`), not by a `properties.name` string.
   // Every US state is highlighted except Montana (30) and North Dakota (38).
+  // Puerto Rico (72) is also included as a service territory.
   var SERVICE_AREA_STATE_FIPS = [
     1, 2, 4, 5, 6, 8, 9, 10, 12, 13, 15, 16, 17, 18, 19, 20, 21, 22, 23,
     24, 25, 26, 27, 28, 29, 31, 32, 33, 34, 35, 36, 37, 39, 40, 41, 42,
-    44, 45, 46, 47, 48, 49, 50, 51, 53, 54, 55, 56
+    44, 45, 46, 47, 48, 49, 50, 51, 53, 54, 55, 56, 72
   ];
 
   var serviceAreaFips = SERVICE_AREA_STATE_FIPS.reduce(function (acc, fips) {
@@ -509,7 +512,6 @@
   mapHI.on('load', function () {
     topologyPromise.then(function (topology) {
       addStateLayers(mapHI, topology, { 15: true }, 'hi');
-      // Add any HI location markers
       locations.filter(function (l) { return l.state === 'HI'; }).forEach(function (loc) {
         var el = document.createElement('div');
         el.className = 'pulse-marker' + (loc.type === 'hq' ? ' hq-marker' : '');
@@ -520,6 +522,34 @@
         new mapboxgl.Marker({ element: el, anchor: 'center' })
           .setLngLat([loc.lng, loc.lat])
           .addTo(mapHI);
+      });
+    });
+  });
+
+  // ── Puerto Rico inset ─────────────────────────────────────────────────
+  var mapPR = new mapboxgl.Map({
+    container: 'pulse-map-pr',
+    style: 'mapbox://styles/mapbox/light-v11',
+    // Puerto Rico: ~65.2°W–67.3°W, ~17.9°N–18.5°N.
+    // Zoom 5.8 fills a 160×130px box with the main island.
+    center: [-66.4, 18.22],
+    zoom: 5.8,
+    interactive: false,
+    attributionControl: false
+  });
+  mapPR.on('load', function () {
+    topologyPromise.then(function (topology) {
+      addStateLayers(mapPR, topology, { 72: true }, 'pr');
+      locations.filter(function (l) { return l.state === 'PR'; }).forEach(function (loc) {
+        var el = document.createElement('div');
+        el.className = 'pulse-marker' + (loc.type === 'hq' ? ' hq-marker' : '');
+        el.innerHTML = badgeSvg(
+          { hq: HQ_COLOR, service: SERVICE_COLOR, warehouse: WAREHOUSE_COLOR, future: FUTURE_COLOR }[loc.type] || SERVICE_COLOR,
+          { hq: 'P', service: null, warehouse: 'W', future: 'F' }[loc.type]
+        );
+        new mapboxgl.Marker({ element: el, anchor: 'center' })
+          .setLngLat([loc.lng, loc.lat])
+          .addTo(mapPR);
       });
     });
   });
